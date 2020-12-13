@@ -6,5 +6,5 @@
     "noImplicitAny": false,
     "strict": false
   },
-  "include": ["src/**/*.ts", "src/**/*.js"],
+  "include": ["src/**/*.ts", "src/**/*.js", "scenes/**/*.ts"]
 }
