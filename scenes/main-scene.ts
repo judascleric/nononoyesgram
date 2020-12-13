@@ -3,6 +3,9 @@ export class MainScene extends Phaser.Scene {
     private puzzleBG: Phaser.GameObjects.Rectangle;
     private puzzleGrid: Phaser.GameObjects.Line[];
     private puzzleText: Phaser.GameObjects.Text[];
+    private bgm: Phaser.Sound.BaseSound;
+    private fills: Phaser.GameObjects.Rectangle[];
+    private xs: Phaser.GameObjects.Line[];
 
     constructor() {
         super({
@@ -12,6 +15,7 @@ export class MainScene extends Phaser.Scene {
 
     preload(): void {
         this.load.image("bg_forest", "../assets/bg_forest_900_600.png");
+        this.load.audio("bgm_chill", ["../assets/bgm_chill.mp3"]);
     }
 
     create(): void {
@@ -22,6 +26,8 @@ export class MainScene extends Phaser.Scene {
         const minorColor = 0xaaaaaa;
         const majorColor = 0xdddddd;
         const borderColor = 0xffffff;
+        const fillColor = 0xf3e1f7;
+        const xColor = 0xdddddd;
         const majorWidth = 2;
         const borderWidth = 2;
         const unitSpace = 40;
@@ -115,5 +121,35 @@ export class MainScene extends Phaser.Scene {
                     .setOrigin(0, 0),
             );
         }
+        this.fills = [];
+        this.fills.push(
+            this.add.rectangle(left + 4, top + 4, unitSpace - 8, unitSpace - 8, fillColor, 0.9).setOrigin(0, 0),
+        );
+        this.xs = [];
+        const xPad = 6;
+        this.xs.push(
+            this.add
+                .line(0, 0, left + unitSpace + xPad, top + xPad, left + 2 * unitSpace - xPad, top + unitSpace - xPad)
+                .setOrigin(0, 0)
+                .setStrokeStyle(1, xColor)
+                .setLineWidth(3),
+        );
+        this.xs.push(
+            this.add
+                .line(0, 0, left + unitSpace + xPad, top + unitSpace - xPad, left + 2 * unitSpace - xPad, top + xPad)
+                .setOrigin(0, 0)
+                .setStrokeStyle(1, xColor)
+                .setLineWidth(3),
+        );
+        // this.bgm = this.sound.add("bgm_chill", { loop: true });
+        // if (!this.sound.locked) {
+        //     // already unlocked so play
+        //     this.bgm.play();
+        // } else {
+        //     // wait for 'unlocked' to fire and then play
+        //     this.sound.once(Phaser.Sound.Events.UNLOCKED, () => {
+        //         this.bgm.play();
+        //     });
+        // }
     }
 }
