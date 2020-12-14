@@ -83,7 +83,7 @@ export class PuzzleConfig {
 
 export class Puzzle extends Phaser.GameObjects.Container {
     private config: PuzzleConfig;
-    private puzzleBG: Phaser.GameObjects.Rectangle;
+    public puzzleBG: Phaser.GameObjects.Rectangle;
     private puzzleGrid: Phaser.GameObjects.Line[];
     private puzzleText: Phaser.GameObjects.Text[];
     private fills: Phaser.GameObjects.Rectangle[];
@@ -189,12 +189,12 @@ export class Puzzle extends Phaser.GameObjects.Container {
         const xPad = 6;
         const x1 = new Phaser.GameObjects.Line(
             this.scene,
-            0,
-            0,
-            dim.left + dim.unitSpace + xPad,
-            dim.top + xPad,
-            dim.left + 2 * dim.unitSpace - xPad,
-            dim.top + dim.unitSpace - xPad,
+            dim.left,
+            dim.top,
+            xPad,
+            xPad,
+            dim.unitSpace - xPad,
+            dim.unitSpace - xPad,
         )
             .setOrigin(0, 0)
             .setStrokeStyle(1, style.xColor)
@@ -203,12 +203,12 @@ export class Puzzle extends Phaser.GameObjects.Container {
         this.add(x1);
         const x2 = new Phaser.GameObjects.Line(
             this.scene,
-            0,
-            0,
-            dim.left + dim.unitSpace + xPad,
-            dim.top + dim.unitSpace - xPad,
-            dim.left + 2 * dim.unitSpace - xPad,
-            dim.top + xPad,
+            dim.left,
+            dim.top,
+            xPad,
+            dim.unitSpace - xPad,
+            dim.unitSpace - xPad,
+            xPad,
         )
             .setOrigin(0, 0)
             .setStrokeStyle(1, style.xColor)
@@ -216,5 +216,18 @@ export class Puzzle extends Phaser.GameObjects.Container {
         this.xs.push(x2);
         this.add(x2);
         this.scene.add.existing(this);
+    }
+
+    onPointerMove(pointer: Phaser.Input.Pointer): void {
+        this.fills[0].x = pointer.x;
+        this.fills[0].y = pointer.y;
+    }
+
+    onPointerDown(pointer: Phaser.Input.Pointer): void {
+        console.log(`onPointerDown ${pointer.x}, ${pointer.y}`);
+        this.xs[0].x = pointer.x;
+        this.xs[0].y = pointer.y;
+        this.xs[1].x = pointer.x;
+        this.xs[1].y = pointer.y;
     }
 }
