@@ -9,4 +9,9 @@ export enum UnitType {
     COL = 1,
 }
 
+export type Coord = {
+    x: number;
+    y: number;
+};
+
 export type StringIndexed = Record<string, any>;

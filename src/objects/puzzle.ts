@@ -1,4 +1,4 @@
-import { UnitType } from "../types";
+import { Coord, UnitType } from "../types";
 
 export type UnitHints = number[];
 
@@ -17,10 +17,13 @@ export class PuzzleStyle {
     public majorColor: number;
     public borderColor: number;
     public fillColor: number;
+    public fillAlpha: number;
     public xColor: number;
     public majorWidth: number;
     public borderWidth: number;
     public textStyle: Phaser.Types.GameObjects.Text.TextStyle;
+    public highlightColor: number;
+
     constructor() {
         this.bgColor = 0x101010;
         this.bgAlpha = 0.8;
@@ -28,10 +31,12 @@ export class PuzzleStyle {
         this.majorColor = 0xdddddd;
         this.borderColor = 0xffffff;
         this.fillColor = 0xf3e1f7;
+        this.fillAlpha = 0.9;
         this.xColor = 0xdddddd;
         this.majorWidth = 2;
         this.borderWidth = 2;
         this.textStyle = { fontFamily: '"Courier New",monospace', fontSize: "28px", align: "right" };
+        this.highlightColor = 0x83fcb8;
     }
 }
 
@@ -49,6 +54,9 @@ export class PuzzleDim {
     public rowTextYOff: number;
     public colTextXOff: number;
     public colTextYOff: number;
+    public fillPad: number;
+    public xPad: number;
+    public hPad: number;
     constructor(data: PuzzleData) {
         if (data.size[UnitType.ROW] === 10 && data.size[UnitType.COL] === 10) {
             this.unitSpace = 40;
@@ -64,6 +72,9 @@ export class PuzzleDim {
             this.rowTextYOff = 8;
             this.colTextXOff = 12;
             this.colTextYOff = -18;
+            this.fillPad = 4;
+            this.xPad = 6;
+            this.hPad = 2;
         } else {
             throw new Error(`No Dimensions defined for puzzle size ${data.size}`);
         }
@@ -86,8 +97,9 @@ export class Puzzle extends Phaser.GameObjects.Container {
     public puzzleBG: Phaser.GameObjects.Rectangle;
     private puzzleGrid: Phaser.GameObjects.Line[];
     private puzzleText: Phaser.GameObjects.Text[];
-    private fills: Phaser.GameObjects.Rectangle[];
-    private xs: Phaser.GameObjects.Line[];
+    private fills: Phaser.GameObjects.Rectangle[][];
+    private xs: Phaser.GameObjects.Group[][];
+    private highlight: Phaser.GameObjects.Group;
 
     constructor(scene: Phaser.Scene, config: PuzzleConfig) {
         super(scene);
@@ -175,59 +187,125 @@ export class Puzzle extends Phaser.GameObjects.Container {
             this.puzzleText.push(text);
             this.add(text);
         }
-        const fill = new Phaser.GameObjects.Rectangle(
+        for (let j = 0; j < this.config.data.size[UnitType.ROW]; ++j) {
+            this.fills.push([]);
+            for (let i = 0; i < this.config.data.size[UnitType.COL]; ++i) {
+                const fill = new Phaser.GameObjects.Rectangle(
+                    this.scene,
+                    dim.left + i * dim.unitSpace + dim.fillPad,
+                    dim.top + j * dim.unitSpace + dim.fillPad,
+                    dim.unitSpace - 2 * dim.fillPad,
+                    dim.unitSpace - 2 * dim.fillPad,
+                    style.fillColor,
+                    style.fillAlpha,
+                )
+                    .setOrigin(0, 0)
+                    .setVisible(false);
+                this.fills[j].push(fill);
+                this.add(fill);
+            }
+        }
+        for (let j = 0; j < this.config.data.size[UnitType.ROW]; ++j) {
+            this.xs.push([]);
+            for (let i = 0; i < this.config.data.size[UnitType.COL]; ++i) {
+                const x1 = new Phaser.GameObjects.Line(
+                    this.scene,
+                    dim.left + i * dim.unitSpace,
+                    dim.top + j * dim.unitSpace,
+                    dim.xPad,
+                    dim.xPad,
+                    dim.unitSpace - dim.xPad,
+                    dim.unitSpace - dim.xPad,
+                )
+                    .setOrigin(0, 0)
+                    .setStrokeStyle(1, style.xColor)
+                    .setLineWidth(3);
+                const x2 = new Phaser.GameObjects.Line(
+                    this.scene,
+                    dim.left + i * dim.unitSpace,
+                    dim.top + j * dim.unitSpace,
+                    dim.xPad,
+                    dim.unitSpace - dim.xPad,
+                    dim.unitSpace - dim.xPad,
+                    dim.xPad,
+                )
+                    .setOrigin(0, 0)
+                    .setStrokeStyle(1, style.xColor)
+                    .setLineWidth(3);
+                const group = new Phaser.GameObjects.Group(this.scene, [x1, x2]).setVisible(false);
+                this.xs[j].push(group);
+                this.add([x1, x2]);
+            }
+        }
+        const h1 = new Phaser.GameObjects.Line(
             this.scene,
-            dim.left + 4,
-            dim.top + 4,
-            dim.unitSpace - 8,
-            dim.unitSpace - 8,
-            style.fillColor,
-            0.9,
+            0,
+            0,
+            dim.hPad,
+            dim.hPad,
+            dim.unitSpace - dim.hPad,
+            dim.hPad,
+            style.highlightColor,
         ).setOrigin(0, 0);
-        this.fills.push(fill);
-        this.add(fill);
-        const xPad = 6;
-        const x1 = new Phaser.GameObjects.Line(
+        const h2 = new Phaser.GameObjects.Line(
             this.scene,
-            dim.left,
-            dim.top,
-            xPad,
-            xPad,
-            dim.unitSpace - xPad,
-            dim.unitSpace - xPad,
-        )
-            .setOrigin(0, 0)
-            .setStrokeStyle(1, style.xColor)
-            .setLineWidth(3);
-        this.xs.push(x1);
-        this.add(x1);
-        const x2 = new Phaser.GameObjects.Line(
+            0,
+            0,
+            dim.hPad,
+            dim.unitSpace - dim.hPad,
+            dim.unitSpace - dim.hPad,
+            dim.unitSpace - dim.hPad,
+            style.highlightColor,
+        ).setOrigin(0, 0);
+        const h3 = new Phaser.GameObjects.Line(
             this.scene,
-            dim.left,
-            dim.top,
-            xPad,
-            dim.unitSpace - xPad,
-            dim.unitSpace - xPad,
-            xPad,
-        )
-            .setOrigin(0, 0)
-            .setStrokeStyle(1, style.xColor)
-            .setLineWidth(3);
-        this.xs.push(x2);
-        this.add(x2);
+            0,
+            0,
+            dim.hPad,
+            dim.hPad,
+            dim.hPad,
+            dim.unitSpace - dim.hPad,
+            style.highlightColor,
+        ).setOrigin(0, 0);
+        const h4 = new Phaser.GameObjects.Line(
+            this.scene,
+            0,
+            0,
+            dim.unitSpace - dim.hPad,
+            dim.hPad,
+            dim.unitSpace - dim.hPad,
+            dim.unitSpace - dim.hPad,
+            style.highlightColor,
+        ).setOrigin(0, 0);
+        this.highlight = new Phaser.GameObjects.Group(this.scene, [h1, h2, h3, h4]).setVisible(false);
+        this.add([h1, h2, h3, h4]);
         this.scene.add.existing(this);
     }
 
+    inSquare(x: number, y: number): Coord | null {
+        const dim = this.config.dim;
+        if (x < dim.left || x > dim.right || y < dim.top || y > dim.bottom) return null;
+        return { x: Math.floor((x - dim.left) / dim.unitSpace), y: Math.floor((y - dim.top) / dim.unitSpace) } as Coord;
+    }
+
     onPointerMove(pointer: Phaser.Input.Pointer): void {
-        this.fills[0].x = pointer.x;
-        this.fills[0].y = pointer.y;
+        const coord = this.inSquare(pointer.x, pointer.y);
+        if (coord === null) {
+            this.highlight.setVisible(false);
+        } else {
+            const dim = this.config.dim;
+            this.highlight.setX(dim.left + coord.x * dim.unitSpace);
+            this.highlight.setY(dim.top + coord.y * dim.unitSpace);
+            this.highlight.setVisible(true);
+            if (pointer.isDown) {
+                this.fills[coord.y][coord.x].setVisible(true);
+            }
+        }
     }
 
     onPointerDown(pointer: Phaser.Input.Pointer): void {
-        console.log(`onPointerDown ${pointer.x}, ${pointer.y}`);
-        this.xs[0].x = pointer.x;
-        this.xs[0].y = pointer.y;
-        this.xs[1].x = pointer.x;
-        this.xs[1].y = pointer.y;
+        const coord = this.inSquare(pointer.x, pointer.y);
+        if (coord === null) return;
+        this.fills[coord.y][coord.x].setVisible(true);
     }
 }
