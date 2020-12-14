@@ -107,9 +107,10 @@ export class Puzzle extends Phaser.GameObjects.Container {
     constructor(scene: Phaser.Scene, config: PuzzleConfig) {
         super(scene);
         this.config = config;
-        this.squareValues = new Array<Value[]>(this.config.data.size[UnitType.ROW]).fill(
-            new Array<Value>(this.config.data.size[UnitType.ROW]).fill(Value.UNSOLVED),
-        );
+        this.squareValues = new Array<Value[]>(this.config.data.size[UnitType.ROW]);
+        for (let i = 0; i < this.config.data.size[UnitType.ROW]; ++i) {
+            this.squareValues[i] = new Array<Value>(this.config.data.size[UnitType.COL]).fill(Value.UNSOLVED);
+        }
         this.activeBrush = Value.FILL;
         this.curTouch = { x: 0, y: 0 };
         this.puzzleGrid = [];
@@ -309,7 +310,10 @@ export class Puzzle extends Phaser.GameObjects.Container {
         if (pointer.isDown) {
             if (coord.x !== this.curTouch.x || coord.y !== this.curTouch.y) {
                 this.curTouch = coord;
-                this.setSquare(coord, this.activeBrush);
+                const cur = this.squareValues[coord.y][coord.x];
+                if (this.activeBrush === Value.UNSOLVED || cur === Value.UNSOLVED) {
+                    this.setSquare(coord, this.activeBrush);
+                }
             }
         }
     }
@@ -318,7 +322,6 @@ export class Puzzle extends Phaser.GameObjects.Container {
         const coord = this.inSquare(pointer.x, pointer.y);
         if (coord === null) return;
         const cur = this.squareValues[coord.y][coord.x];
-        console.log(`onPointerUp cur = ${cur}`);
         if (cur === Value.UNSOLVED) {
             this.activeBrush = Value.FILL;
         } else if (cur === Value.FILL) {
@@ -332,6 +335,7 @@ export class Puzzle extends Phaser.GameObjects.Container {
 
     onPointerUp(): void {
         this.curTouch = { x: -1, y: -1 };
+        this.activeBrush = Value.UNSOLVED;
     }
 
     setSquare(coord: Coord, value: Value): void {
