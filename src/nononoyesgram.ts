@@ -1,5 +1,6 @@
 import "phaser";
 import { MainScene } from "../scenes/main-scene";
+import { Puzzle } from "./objects/puzzle";
 
 // main game configuration
 const config: Phaser.Types.Core.GameConfig = {
@@ -11,6 +12,7 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 export class Game extends Phaser.Game {
+    private puzzle: Puzzle;
     constructor(config: Phaser.Types.Core.GameConfig) {
         super(config);
     }
