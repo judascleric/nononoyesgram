@@ -35,5 +35,6 @@ export class MainScene extends Phaser.Scene {
         this.puzzle = new Puzzle(this, new PuzzleConfig(data, style));
         this.input.on("pointermove", (pointer: Phaser.Input.Pointer) => this.puzzle.onPointerMove(pointer), this);
         this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => this.puzzle.onPointerDown(pointer), this);
+        this.input.on("pointerup", () => this.puzzle.onPointerUp(), this);
     }
 }

@@ -1,4 +1,4 @@
-import { Coord, UnitType } from "../types";
+import { Coord, UnitType, Value } from "../types";
 
 export type UnitHints = number[];
 
@@ -100,10 +100,18 @@ export class Puzzle extends Phaser.GameObjects.Container {
     private fills: Phaser.GameObjects.Rectangle[][];
     private xs: Phaser.GameObjects.Group[][];
     private highlight: Phaser.GameObjects.Group;
+    private squareValues: Value[][];
+    private activeBrush: Value;
+    private curTouch: Coord;
 
     constructor(scene: Phaser.Scene, config: PuzzleConfig) {
         super(scene);
         this.config = config;
+        this.squareValues = new Array<Value[]>(this.config.data.size[UnitType.ROW]).fill(
+            new Array<Value>(this.config.data.size[UnitType.ROW]).fill(Value.UNSOLVED),
+        );
+        this.activeBrush = Value.FILL;
+        this.curTouch = { x: 0, y: 0 };
         this.puzzleGrid = [];
         this.fills = [];
         this.xs = [];
@@ -292,13 +300,16 @@ export class Puzzle extends Phaser.GameObjects.Container {
         const coord = this.inSquare(pointer.x, pointer.y);
         if (coord === null) {
             this.highlight.setVisible(false);
-        } else {
-            const dim = this.config.dim;
-            this.highlight.setX(dim.left + coord.x * dim.unitSpace);
-            this.highlight.setY(dim.top + coord.y * dim.unitSpace);
-            this.highlight.setVisible(true);
-            if (pointer.isDown) {
-                this.fills[coord.y][coord.x].setVisible(true);
+            return;
+        }
+        const dim = this.config.dim;
+        this.highlight.setX(dim.left + coord.x * dim.unitSpace);
+        this.highlight.setY(dim.top + coord.y * dim.unitSpace);
+        this.highlight.setVisible(true);
+        if (pointer.isDown) {
+            if (coord.x !== this.curTouch.x || coord.y !== this.curTouch.y) {
+                this.curTouch = coord;
+                this.setSquare(coord, this.activeBrush);
             }
         }
     }
@@ -306,6 +317,34 @@ export class Puzzle extends Phaser.GameObjects.Container {
     onPointerDown(pointer: Phaser.Input.Pointer): void {
         const coord = this.inSquare(pointer.x, pointer.y);
         if (coord === null) return;
-        this.fills[coord.y][coord.x].setVisible(true);
+        const cur = this.squareValues[coord.y][coord.x];
+        console.log(`onPointerUp cur = ${cur}`);
+        if (cur === Value.UNSOLVED) {
+            this.activeBrush = Value.FILL;
+        } else if (cur === Value.FILL) {
+            this.activeBrush = Value.X;
+        } else {
+            this.activeBrush = Value.UNSOLVED;
+        }
+        this.curTouch = coord;
+        this.setSquare(coord, this.activeBrush);
+    }
+
+    onPointerUp(): void {
+        this.curTouch = { x: -1, y: -1 };
+    }
+
+    setSquare(coord: Coord, value: Value): void {
+        this.squareValues[coord.y][coord.x] = value;
+        if (value === Value.FILL) {
+            this.fills[coord.y][coord.x].setVisible(true);
+            this.xs[coord.y][coord.x].setVisible(false);
+        } else if (value === Value.X) {
+            this.fills[coord.y][coord.x].setVisible(false);
+            this.xs[coord.y][coord.x].setVisible(true);
+        } else {
+            this.fills[coord.y][coord.x].setVisible(false);
+            this.xs[coord.y][coord.x].setVisible(false);
+        }
     }
 }
