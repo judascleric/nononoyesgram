@@ -1,0 +1,9 @@
+{
+    "name": "create-puzzle",
+    "version": "1.0.0",
+    "author": "judascleric",
+    "license": "ISC",
+    "dependencies": {
+        "get-pixels": "^3.3.2"
+    }
+}

@@ -16,7 +16,8 @@ export class MainScene extends Phaser.Scene {
     preload(): void {
         this.load.image("bg_forest", "../assets/bg_forest_900_600.png");
         this.load.audio("bgm_chill", ["../assets/bgm_chill.m4a"]);
-        this.load.json("puzzle_data", "../puzzles/P001.json");
+        this.load.json("puzzle_data", "../puzzles/P001-Perseids.json");
+        this.load.image("missing", "../assets/missing.png");
     }
 
     create(): void {
@@ -43,7 +44,6 @@ export class MainScene extends Phaser.Scene {
     update(): void {
         const solved = this.puzzle.update();
         if (solved && !this.outroStarted) {
-            this.scene.pause();
             this.outroStarted = true;
         }
     }

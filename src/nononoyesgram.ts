@@ -8,6 +8,9 @@ const config: Phaser.Types.Core.GameConfig = {
     height: 600,
     type: Phaser.AUTO,
     parent: "game",
+    render: {
+        pixelArt: true,
+    },
     scene: MainScene,
 };
 

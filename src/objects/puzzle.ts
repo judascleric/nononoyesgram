@@ -5,8 +5,10 @@ export type UnitHints = number[];
 export type PuzzleData = {
     name: string;
     id: string;
+    image: string;
     size: number[];
     hints: UnitHints[][];
+
     solution: string[];
 };
 
@@ -22,6 +24,7 @@ export class PuzzleStyle {
     public majorWidth: number;
     public borderWidth: number;
     public textStyle: Phaser.Types.GameObjects.Text.TextStyle;
+    public titleTextStyle: Phaser.Types.GameObjects.Text.TextStyle;
     public highlightColor: number;
 
     constructor() {
@@ -36,6 +39,7 @@ export class PuzzleStyle {
         this.majorWidth = 2;
         this.borderWidth = 2;
         this.textStyle = { fontFamily: '"Courier New",monospace', fontSize: "28px", align: "right" };
+        this.titleTextStyle = { fontFamily: '"Courier New",monospace', fontSize: "28px", align: "center" };
         this.highlightColor = 0x83fcb8;
     }
 }
@@ -57,6 +61,7 @@ export class PuzzleDim {
     public fillPad: number;
     public xPad: number;
     public hPad: number;
+    public titleYOff: number;
     constructor(data: PuzzleData) {
         if (data.size[UnitType.ROW] === 10 && data.size[UnitType.COL] === 10) {
             this.unitSpace = 40;
@@ -75,6 +80,7 @@ export class PuzzleDim {
             this.fillPad = 4;
             this.xPad = 6;
             this.hPad = 2;
+            this.titleYOff = -32;
         } else {
             throw new Error(`No Dimensions defined for puzzle size ${data.size}`);
         }
@@ -99,13 +105,17 @@ export class Puzzle extends Phaser.GameObjects.Container {
     private puzzleText: Phaser.GameObjects.Text[];
     private fills: Phaser.GameObjects.Rectangle[][];
     private xs: Phaser.GameObjects.Group[][];
+    private xSegments: Phaser.GameObjects.Line[];
     private highlight: Phaser.GameObjects.Group;
+    private highlightSegments: Phaser.GameObjects.Line[];
     private squareValues: Value[][];
     private activeBrush: Value;
     private curTouch: Coord;
     private solution: Value[][];
     private solved: boolean;
     private outroStarted: boolean;
+    private titleText: Phaser.GameObjects.Text;
+    private solutionImage: Phaser.GameObjects.Image;
 
     constructor(scene: Phaser.Scene, config: PuzzleConfig) {
         super(scene);
@@ -113,6 +123,7 @@ export class Puzzle extends Phaser.GameObjects.Container {
         this.solved = false;
         this.outroStarted = false;
         this.parseSolution();
+
         this.squareValues = new Array<Value[]>(this.config.data.size[UnitType.ROW]);
         for (let i = 0; i < this.config.data.size[UnitType.ROW]; ++i) {
             this.squareValues[i] = new Array<Value>(this.config.data.size[UnitType.COL]).fill(Value.UNSOLVED);
@@ -122,6 +133,8 @@ export class Puzzle extends Phaser.GameObjects.Container {
         this.puzzleGrid = [];
         this.fills = [];
         this.xs = [];
+        this.xSegments = [];
+        this.highlightSegments = [];
         const rowLen = this.config.data.hints[UnitType.ROW].length;
         const colLen = this.config.data.hints[UnitType.COL].length;
         const dim = this.config.dim;
@@ -248,6 +261,8 @@ export class Puzzle extends Phaser.GameObjects.Container {
                     .setStrokeStyle(1, style.xColor)
                     .setLineWidth(3);
                 const group = new Phaser.GameObjects.Group(this.scene, [x1, x2]).setVisible(false);
+                this.xSegments.push(x1);
+                this.xSegments.push(x2);
                 this.xs[j].push(group);
                 this.add([x1, x2]);
             }
@@ -293,7 +308,30 @@ export class Puzzle extends Phaser.GameObjects.Container {
             style.highlightColor,
         ).setOrigin(0, 0);
         this.highlight = new Phaser.GameObjects.Group(this.scene, [h1, h2, h3, h4]).setVisible(false);
-        this.add([h1, h2, h3, h4]);
+        this.highlightSegments = [h1, h2, h3, h4];
+        this.add(this.highlightSegments);
+        this.titleText = new Phaser.GameObjects.Text(
+            this.scene,
+            dim.left,
+            dim.top + dim.titleYOff,
+            this.config.data.name,
+            style.titleTextStyle,
+        )
+            .setOrigin(0, 0)
+            .setAlpha(0.0)
+            .setFixedSize(dim.width, 0);
+        this.add(this.titleText);
+        this.solutionImage = new Phaser.GameObjects.Image(this.scene, dim.left, dim.top, "missing")
+            .setOrigin(0, 0)
+            .setAlpha(0.0);
+        this.add(this.solutionImage);
+        this.scene.load.image("solution_image", this.config.data.image);
+        this.scene.load.once(Phaser.Loader.Events.COMPLETE, () => {
+            this.solutionImage
+                .setTexture("solution_image")
+                .setDisplaySize(this.config.dim.width, this.config.dim.height);
+        });
+        this.scene.load.start();
         this.scene.add.existing(this);
     }
 
@@ -304,6 +342,7 @@ export class Puzzle extends Phaser.GameObjects.Container {
     }
 
     onPointerMove(pointer: Phaser.Input.Pointer): void {
+        if (this.solved) return;
         const coord = this.inSquare(pointer.x, pointer.y);
         if (coord === null) {
             this.highlight.setVisible(false);
@@ -325,6 +364,7 @@ export class Puzzle extends Phaser.GameObjects.Container {
     }
 
     onPointerDown(pointer: Phaser.Input.Pointer): void {
+        if (this.solved) return;
         const coord = this.inSquare(pointer.x, pointer.y);
         if (coord === null) return;
         const cur = this.squareValues[coord.y][coord.x];
@@ -383,14 +423,19 @@ export class Puzzle extends Phaser.GameObjects.Container {
         return true;
     }
 
-    fadeout(): void {
-        this.scene.add.tween({ targets: this.puzzleGrid, duration: 2000, alpha: 0.0 });
-        this.scene.add.tween({ targets: this.puzzleText, duration: 2000, alpha: 0.0 });
+    outro(): void {
+        const fadeOutObjs = [...this.puzzleGrid, ...this.puzzleText, ...this.highlightSegments, ...this.xSegments];
+        const fadeTimeMs = 2000;
+        this.scene.add.tween({ alpha: 0.0, targets: fadeOutObjs, duration: fadeTimeMs });
+        const allFills = [].concat(...this.fills);
+        this.scene.add.tween({ alpha: 0.5, targets: allFills, delay: fadeTimeMs, duration: fadeTimeMs });
+        this.scene.add.tween({ alpha: 1.0, targets: this.titleText, delay: fadeTimeMs, duration: fadeTimeMs });
+        this.scene.add.tween({ alpha: 0.5, targets: this.solutionImage, delay: fadeTimeMs, duration: fadeTimeMs });
     }
 
     update(): boolean {
         if (this.solved && !this.outroStarted) {
-            this.fadeout();
+            this.outro();
             this.outroStarted = true;
         }
         return this.solved;
