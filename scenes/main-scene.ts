@@ -43,6 +43,7 @@ export class MainScene extends Phaser.Scene {
     update(): void {
         const solved = this.puzzle.update();
         if (solved && !this.outroStarted) {
+            this.scene.pause();
             this.outroStarted = true;
         }
     }
