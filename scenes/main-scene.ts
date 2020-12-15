@@ -4,11 +4,13 @@ export class MainScene extends Phaser.Scene {
     private background: Phaser.GameObjects.Image;
     private bgm: Phaser.Sound.BaseSound;
     private puzzle: Puzzle;
+    private outroStarted: boolean;
 
     constructor() {
         super({
             key: "MainScene",
         });
+        this.outroStarted = false;
     }
 
     preload(): void {
@@ -36,5 +38,12 @@ export class MainScene extends Phaser.Scene {
         this.input.on("pointermove", (pointer: Phaser.Input.Pointer) => this.puzzle.onPointerMove(pointer), this);
         this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => this.puzzle.onPointerDown(pointer), this);
         this.input.on("pointerup", () => this.puzzle.onPointerUp(), this);
+    }
+
+    update(): void {
+        const solved = this.puzzle.update();
+        if (solved && !this.outroStarted) {
+            this.outroStarted = true;
+        }
     }
 }

@@ -7,7 +7,7 @@ export type PuzzleData = {
     id: string;
     size: number[];
     hints: UnitHints[][];
-    solution: string[][];
+    solution: string[];
 };
 
 export class PuzzleStyle {
@@ -103,10 +103,16 @@ export class Puzzle extends Phaser.GameObjects.Container {
     private squareValues: Value[][];
     private activeBrush: Value;
     private curTouch: Coord;
+    private solution: Value[][];
+    private solved: boolean;
+    private outroStarted: boolean;
 
     constructor(scene: Phaser.Scene, config: PuzzleConfig) {
         super(scene);
         this.config = config;
+        this.solved = false;
+        this.outroStarted = false;
+        this.parseSolution();
         this.squareValues = new Array<Value[]>(this.config.data.size[UnitType.ROW]);
         for (let i = 0; i < this.config.data.size[UnitType.ROW]; ++i) {
             this.squareValues[i] = new Array<Value>(this.config.data.size[UnitType.COL]).fill(Value.UNSOLVED);
@@ -340,6 +346,9 @@ export class Puzzle extends Phaser.GameObjects.Container {
 
     setSquare(coord: Coord, value: Value): void {
         this.squareValues[coord.y][coord.x] = value;
+        if (this.isSolved()) {
+            this.solved = true;
+        }
         if (value === Value.FILL) {
             this.fills[coord.y][coord.x].setVisible(true);
             this.xs[coord.y][coord.x].setVisible(false);
@@ -350,5 +359,40 @@ export class Puzzle extends Phaser.GameObjects.Container {
             this.fills[coord.y][coord.x].setVisible(false);
             this.xs[coord.y][coord.x].setVisible(false);
         }
+    }
+
+    parseSolution(): void {
+        this.solution = new Array<Value[]>();
+        this.config.data.solution.forEach(rowText => {
+            this.solution.push([...rowText.replace(/\s/g, "")].map(c => (c === "1" ? Value.FILL : Value.UNSOLVED)));
+        });
+        // console.log(`solution =\n${this.solution.map(row => row.toString()).join("\n")}`);
+    }
+
+    isSolved(): boolean {
+        for (let y = 0; y < this.config.data.size[UnitType.ROW]; ++y) {
+            for (let x = 0; x < this.config.data.size[UnitType.COL]; ++x) {
+                if (this.solution[y][x] === Value.FILL && this.squareValues[y][x] !== Value.FILL) {
+                    return false;
+                }
+                if (this.squareValues[y][x] === Value.FILL && this.solution[y][x] !== Value.FILL) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    fadeout(): void {
+        this.scene.add.tween({ targets: this.puzzleGrid, duration: 2000, alpha: 0.0 });
+        this.scene.add.tween({ targets: this.puzzleText, duration: 2000, alpha: 0.0 });
+    }
+
+    update(): boolean {
+        if (this.solved && !this.outroStarted) {
+            this.fadeout();
+            this.outroStarted = true;
+        }
+        return this.solved;
     }
 }
