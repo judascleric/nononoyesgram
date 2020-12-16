@@ -1,5 +1,6 @@
 import "phaser";
-import { MainScene } from "../scenes/main-scene";
+import { GameScene } from "../scenes/games_scene";
+import { PuzzleSelectScene } from "../scenes/puzzle_select_scene";
 import { Puzzle } from "./objects/puzzle";
 
 // main game configuration
@@ -11,7 +12,7 @@ const config: Phaser.Types.Core.GameConfig = {
     render: {
         pixelArt: true,
     },
-    scene: MainScene,
+    scene: PuzzleSelectScene,
 };
 
 export class Game extends Phaser.Game {

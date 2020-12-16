@@ -1,6 +1,6 @@
 import { Puzzle, PuzzleConfig, PuzzleStyle } from "../src/objects/puzzle";
 
-export class MainScene extends Phaser.Scene {
+export class GameScene extends Phaser.Scene {
     private background: Phaser.GameObjects.Image;
     private bgm: Phaser.Sound.BaseSound;
     private puzzle: Puzzle;
@@ -8,7 +8,7 @@ export class MainScene extends Phaser.Scene {
 
     constructor() {
         super({
-            key: "MainScene",
+            key: "GameScene",
         });
         this.outroStarted = false;
     }
