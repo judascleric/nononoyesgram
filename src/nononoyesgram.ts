@@ -13,6 +13,7 @@ const config: Phaser.Types.Core.GameConfig = {
         pixelArt: true,
     },
     scene: PuzzleSelectScene,
+    // scene: GameScene,
 };
 
 export class Game extends Phaser.Game {

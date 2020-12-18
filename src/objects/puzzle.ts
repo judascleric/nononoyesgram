@@ -1,4 +1,5 @@
 import { Coord, UnitType, Value } from "../types";
+import { defaultFontFamily } from "../const";
 
 export type UnitHints = number[];
 
@@ -38,8 +39,8 @@ export class PuzzleStyle {
         this.xColor = 0xdddddd;
         this.majorWidth = 2;
         this.borderWidth = 2;
-        this.textStyle = { fontFamily: '"Courier New",monospace', fontSize: "28px", align: "right" };
-        this.titleTextStyle = { fontFamily: '"Courier New",monospace', fontSize: "28px", align: "center" };
+        this.textStyle = { fontFamily: defaultFontFamily, fontSize: "28px", align: "right" };
+        this.titleTextStyle = { fontFamily: defaultFontFamily, fontSize: "28px", align: "center" };
         this.highlightColor = 0x83fcb8;
     }
 }

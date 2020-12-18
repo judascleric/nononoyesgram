@@ -1,6 +1,83 @@
+import { defaultFontFamily } from "../src/const";
+
+class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
+    public inHighlight: boolean;
+    private puzzleFrame: Phaser.GameObjects.Image;
+    private title: Phaser.GameObjects.Text;
+    private x1: number;
+    private y1: number;
+    private growTween: Phaser.Tweens.Tween;
+    private shrinkTween: Phaser.Tweens.Tween;
+    private callback: (square: PuzzleSelectSquare) => void;
+
+    constructor(
+        scene: Phaser.Scene,
+        x: number,
+        y: number,
+        title: string,
+        callback: (square: PuzzleSelectSquare) => void,
+    ) {
+        super(scene, x, y, "unsolved");
+        this.callback = callback;
+        this.x1 = x;
+        this.y1 = y;
+        this.inHighlight = false;
+        this.growTween = null;
+        this.shrinkTween = null;
+        this.setOrigin(0.0);
+        this.setInteractive();
+        this.on("pointerover", () => this.onPointerOver());
+        this.on("pointerout", () => this.onPointerOut());
+        this.puzzleFrame = this.scene.add.image(x, y, "puzzle_frame").setOrigin(0.0);
+        this.title = this.scene.add
+            .text(x - 32, y - 24, title, {
+                fontFamily: defaultFontFamily,
+                fontSize: "18px",
+                align: "center",
+            })
+            .setOrigin(0, 0)
+            .setFixedSize(192, 0);
+    }
+
+    onPointerOver() {
+        if (!this.inHighlight) {
+            if (this.shrinkTween && this.shrinkTween.isPlaying()) {
+                this.shrinkTween.stop();
+                this.shrinkTween = null;
+            }
+            this.growTween = this.scene.add.tween({
+                scale: 1.125,
+                x: this.x1 - 8,
+                y: this.y1 - 8,
+                targets: [this, this.puzzleFrame],
+                duration: 100,
+            });
+            this.inHighlight = true;
+        }
+    }
+
+    onPointerOut() {
+        if (this.inHighlight) {
+            if (this.growTween && this.growTween.isPlaying()) {
+                this.growTween.stop();
+                this.growTween = null;
+            }
+            this.shrinkTween = this.scene.add.tween({
+                scale: 1.0,
+                x: this.x1,
+                y: this.y1,
+                targets: [this, this.puzzleFrame],
+                duration: 100,
+            });
+            this.inHighlight = false;
+        }
+    }
+}
+
 export class PuzzleSelectScene extends Phaser.Scene {
     private background: Phaser.GameObjects.Image;
     private bgm: Phaser.Sound.BaseSound;
+    private puzzleSquares: PuzzleSelectSquare[];
 
     constructor() {
         super({
@@ -17,6 +94,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
     }
 
     create(): void {
+        this.puzzleSquares = [];
         this.cameras.main.setBounds(0, 0, 900, 600);
         this.background = this.add.image(0, 0, "bg_forest").setOrigin(0, 0);
         this.bgm = this.sound.add("bgm_chill", { loop: true });
@@ -29,15 +107,31 @@ export class PuzzleSelectScene extends Phaser.Scene {
                 this.bgm.play();
             });
         }
-        this.add.image(200, 200, "unsolved").setOrigin(0, 0);
-        this.add.image(200, 200, "puzzle_frame").setOrigin(0, 0);
-        this.input.on("pointermove", (pointer: Phaser.Input.Pointer) => this.onPointerMove(pointer), this);
-        this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => this.onPointerDown(pointer), this);
-        this.input.on("pointerup", () => this.onPointerUp(), this);
+
+        this.add
+            .text(120, 80, "Puzzle Select", { fontFamily: defaultFontFamily, fontSize: "42px", align: "center" })
+            .setOrigin(0, 0)
+            .setFixedSize(900 - 240, 0);
+        const left = 80;
+        const top = 180;
+        const xspacing = 200;
+        const yspacing = 180;
+        for (let y = 0; y < 2; ++y) {
+            for (let x = 0; x < 4; ++x) {
+                const puzzleSquare = new PuzzleSelectSquare(
+                    this,
+                    left + x * xspacing,
+                    top + y * yspacing,
+                    "P001",
+                    this.onSelect,
+                );
+                this.puzzleSquares.push(puzzleSquare);
+                this.add.existing(puzzleSquare);
+            }
+        }
     }
 
-    update(): void {}
-    onPointerMove(pointer: Phaser.Input.Pointer): void {}
-    onPointerDown(pointer: Phaser.Input.Pointer): void {}
-    onPointerUp(): void {}
+    onSelect(square: PuzzleSelectSquare): void {
+        console.log(`selected`);
+    }
 }
