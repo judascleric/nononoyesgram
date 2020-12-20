@@ -19,7 +19,8 @@ files
             name: puzzle.name,
             path: "../puzzles/" + file,
             id: puzzle.id,
-            image: puzzle.image,
+            date: puzzle.date,
+            image: puzzle.finishedImage,
             size: puzzle.size,
         };
     });

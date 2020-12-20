@@ -9,19 +9,27 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
 
     public puzzleImage: Phaser.GameObjects.Image;
     private title: Phaser.GameObjects.Text;
+    private date: Phaser.GameObjects.Text;
     private x1: number;
     private y1: number;
     private x2: number;
     private y2: number;
     private scaleFactor = 1.125;
-    private scale1 = this.scale;
-    private scale2 = this.scale * this.scaleFactor;
+    private scale1 = 1.0;
+    private scale2 = this.scaleFactor;
     private growTween1: Phaser.Tweens.Tween;
     private growTween2: Phaser.Tweens.Tween;
     private shrinkTween1: Phaser.Tweens.Tween;
     private shrinkTween2: Phaser.Tweens.Tween;
 
-    constructor(scene: PuzzleSelectScene, puzzleData: PuzzleEntry, id: number, x: number, y: number, title: string) {
+    constructor(
+        scene: PuzzleSelectScene,
+        puzzleData: PuzzleEntry,
+        id: number,
+        x: number,
+        y: number,
+        isSolved: boolean,
+    ) {
         super(scene, x, y, "puzzle_frame");
         this.puzzleData = puzzleData;
         this.id = id;
@@ -29,8 +37,6 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
         this.y1 = y;
         this.x2 = x;
         this.y2 = y;
-        this.scale1 = this.scale;
-        this.scale2 = this.scale * 10;
         this.inputDisabled = false;
         this.inHighlight = false;
         this.growTween1 = null;
@@ -43,10 +49,20 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
         this.on("pointerout", () => this.onPointerOut());
         this.on("pointerdown", () => ((this.scene as PuzzleSelectScene).selectedSquare = this));
         this.puzzleImage = this.scene.add.image(x, y, "unsolved").setOrigin(0.0);
+        const title = isSolved ? this.puzzleData.name : this.puzzleData.id;
         this.title = this.scene.add
             .text(x - 32, y - 24, title, {
                 fontFamily: defaultFontFamily,
                 fontSize: "18px",
+                align: "center",
+            })
+            .setOrigin(0, 0)
+            .setFixedSize(192, 0);
+        const date = isSolved ? this.puzzleData.date : "";
+        this.date = this.scene.add
+            .text(x - 32, y - 40, date, {
+                fontFamily: defaultFontFamily,
+                fontSize: "12px",
                 align: "center",
             })
             .setOrigin(0, 0)
@@ -131,6 +147,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
 
     preload(): void {
         this.loadData = [];
+        // localStorage.setItem("completedPuzzles", "{}");
         const completedData = localStorage.getItem("completedPuzzles") || "{}";
         this.completedPuzzles = JSON.parse(completedData);
         this.load.json("puzzle_manifest", "../puzzles/all_puzzles.json");
@@ -187,7 +204,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
                 y * 4 + x,
                 left + x * xspacing,
                 top + y * yspacing,
-                isSolved ? puzzleData.name : puzzleData.id,
+                isSolved,
             );
             this.puzzleSquares.push(puzzleSquare);
             this.add.existing(puzzleSquare);

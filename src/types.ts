@@ -20,6 +20,7 @@ export type PuzzleEntry = {
     name: string;
     path: string;
     id: string;
+    date: string;
     image: string;
     size: number[];
 };
@@ -36,7 +37,9 @@ export type UnitHints = number[];
 export type PuzzleData = {
     name: string;
     id: string;
+    date: string;
     image: string;
+    finishedImage: string;
     size: number[];
     hints: UnitHints[][];
 

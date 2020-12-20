@@ -1,7 +1,9 @@
 {
   "name": "Perseids",
-  "id": "P001",
-  "image": "../puzzles/images/P001-Perseids.png",
+  "id": "P002",
+  "date": "2007-08-12",
+  "image": "../puzzles/images/P002-Perseids-2007-08-12.png",
+  "finishedImage": "../puzzles/images/P002-Perseids-2007-08-12.png",
   "size": [
     10,
     10

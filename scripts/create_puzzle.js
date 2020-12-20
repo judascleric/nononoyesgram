@@ -15,20 +15,27 @@ const fs = require("fs");
 const getPixels = require("get-pixels");
 
 const args = process.argv.slice(2);
-const imagePath = args[0];
-console.log(imagePath);
+const sourceImagePath = args[0];
+console.log(sourceImagePath);
 
-const fileName = imagePath.substring(imagePath.lastIndexOf("/") + 1);
+const fileName = sourceImagePath.substring(sourceImagePath.lastIndexOf("/") + 1);
 const outFile = `${__dirname}/../puzzles/${fileName.split(".")[0]}.json`;
+const parts = fileName.replace(".png", "").split("-");
+const sourceFinishedPath = sourceImagePath.replace(".png", ".finished.png");
+const imagePath = `../puzzles/images/${fileName}`;
+const finishedPath = imagePath.replace(".png", ".finished.png");
+console.log(parts);
 const puzzleData = {
-    name: fileName.split("-", 2)[1].split(".")[0].replace(/_/g, " "),
-    id: fileName.split("-", 2)[0],
-    image: `../puzzles/images/${fileName}`,
+    name: parts[1].replace(/_/g, " "),
+    id: parts[0],
+    date: parts.slice(2).join("-"),
+    image: imagePath,
+    finishedImage: fs.existsSync(sourceFinishedPath) ? finishedPath : imagePath,
 };
 
-getPixels(imagePath, function (err, pixels) {
+getPixels(sourceImagePath, function (err, pixels) {
     if (err) {
-        console.log(`${imagePath} not found`);
+        console.log(`${sourceImagePath} not found`);
         return;
     }
     console.log("got pixels", pixels.shape.slice());

@@ -1,27 +1,41 @@
 {
   "index": [
-    "P000-Test",
-    "P001-Perseids"
+    "P001-Ice Cream",
+    "P002-Perseids",
+    "P003-Holding Hands"
   ],
   "puzzles": {
-    "P000-Test": {
-      "name": "Test",
-      "path": "../puzzles/P000-Test.json",
-      "id": "P000",
-      "image": "../puzzles/images/P000-Test.png",
+    "P001-Ice Cream": {
+      "name": "Ice Cream",
+      "path": "../puzzles/P001-Ice_Cream-2007-08-12.json",
+      "id": "P001",
+      "date": "2007-08-12",
+      "image": "../puzzles/images/P001-Ice_Cream-2007-08-12.png",
       "size": [
         10,
         10
       ]
     },
-    "P001-Perseids": {
+    "P002-Perseids": {
       "name": "Perseids",
-      "path": "../puzzles/P001-Perseids.json",
-      "id": "P001",
-      "image": "../puzzles/images/P001-Perseids.png",
+      "path": "../puzzles/P002-Perseids-2007-08-12.json",
+      "id": "P002",
+      "date": "2007-08-12",
+      "image": "../puzzles/images/P002-Perseids-2007-08-12.png",
       "size": [
         10,
         10
+      ]
+    },
+    "P003-Holding Hands": {
+      "name": "Holding Hands",
+      "path": "../puzzles/P003-Holding_Hands-2007-08-12.json",
+      "id": "P003",
+      "date": "2007-08-12",
+      "image": "../puzzles/images/P003-Holding_Hands-2007-08-12.finished.png",
+      "size": [
+        15,
+        15
       ]
     }
   }

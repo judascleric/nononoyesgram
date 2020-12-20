@@ -12,7 +12,6 @@ export class PuzzleStyle {
     public xColor: number;
     public majorWidth: number;
     public borderWidth: number;
-    public textStyle: Phaser.Types.GameObjects.Text.TextStyle;
     public titleTextStyle: Phaser.Types.GameObjects.Text.TextStyle;
     public highlightColor: number;
 
@@ -27,7 +26,6 @@ export class PuzzleStyle {
         this.xColor = 0xdddddd;
         this.majorWidth = 2;
         this.borderWidth = 2;
-        this.textStyle = { fontFamily: defaultFontFamily, fontSize: "28px", align: "right" };
         this.titleTextStyle = { fontFamily: defaultFontFamily, fontSize: "28px", align: "center" };
         this.highlightColor = 0x83fcb8;
     }
@@ -51,6 +49,8 @@ export class PuzzleDim {
     public xPad: number;
     public hPad: number;
     public titleYOff: number;
+    public dateYOff: number;
+    public textStyle: Phaser.Types.GameObjects.Text.TextStyle;
     constructor(data: PuzzleData) {
         if (data.size[UnitType.ROW] === 10 && data.size[UnitType.COL] === 10) {
             this.unitSpace = 40;
@@ -70,6 +70,28 @@ export class PuzzleDim {
             this.xPad = 6;
             this.hPad = 2;
             this.titleYOff = -32;
+            this.dateYOff = -64;
+            this.textStyle = { fontFamily: defaultFontFamily, fontSize: "28px", align: "right" };
+        } else if (data.size[UnitType.ROW] === 15 && data.size[UnitType.COL] === 15) {
+            this.unitSpace = 26;
+            this.width = 26 * 15;
+            this.height = 26 * 15;
+            this.left = 300;
+            this.top = 180;
+            this.right = this.left + this.width;
+            this.bottom = this.top + this.height;
+            this.fontWidth = 15;
+            this.fontHeight = 11;
+            this.rowTextXOff = 4;
+            this.rowTextYOff = 3;
+            this.colTextXOff = 6;
+            this.colTextYOff = -14;
+            this.fillPad = 4;
+            this.xPad = 6;
+            this.hPad = 2;
+            this.titleYOff = -32;
+            this.dateYOff = -64;
+            this.textStyle = { fontFamily: defaultFontFamily, fontSize: "23px", align: "right" };
         } else {
             throw new Error(`No Dimensions defined for puzzle size ${data.size}`);
         }
@@ -104,6 +126,7 @@ export class Puzzle extends Phaser.GameObjects.Container {
     private solved: boolean;
     private outroStarted: boolean;
     private titleText: Phaser.GameObjects.Text;
+    private dateText: Phaser.GameObjects.Text;
     private solutionImage: Phaser.GameObjects.Image;
 
     constructor(scene: Phaser.Scene, config: PuzzleConfig) {
@@ -188,7 +211,7 @@ export class Puzzle extends Phaser.GameObjects.Container {
                 dim.left + dim.rowTextXOff - maxRowLen * dim.fontWidth,
                 dim.top + dim.rowTextYOff + i * dim.unitSpace,
                 rowsTexts[i].padStart(maxRowLen, " "),
-                style.textStyle,
+                dim.textStyle,
             ).setOrigin(0, 0);
             this.puzzleText.push(text);
             this.add(text);
@@ -199,7 +222,7 @@ export class Puzzle extends Phaser.GameObjects.Container {
                 dim.left + dim.colTextXOff + i * dim.unitSpace,
                 dim.top + dim.colTextYOff - colsTexts[i].length * dim.fontHeight,
                 colsTexts[i],
-                style.textStyle,
+                dim.textStyle,
             ).setOrigin(0, 0);
             this.puzzleText.push(text);
             this.add(text);
@@ -310,11 +333,22 @@ export class Puzzle extends Phaser.GameObjects.Container {
             .setAlpha(0.0)
             .setFixedSize(dim.width, 0);
         this.add(this.titleText);
+        this.dateText = new Phaser.GameObjects.Text(
+            this.scene,
+            dim.left,
+            dim.top + dim.dateYOff,
+            this.config.data.date,
+            style.titleTextStyle,
+        )
+            .setOrigin(0, 0)
+            .setAlpha(0.0)
+            .setFixedSize(dim.width, 0);
+        this.add(this.dateText);
         this.solutionImage = new Phaser.GameObjects.Image(this.scene, dim.left, dim.top, "missing")
             .setOrigin(0, 0)
             .setAlpha(0.0);
         this.add(this.solutionImage);
-        this.scene.load.image("solution_image", this.config.data.image);
+        this.scene.load.image("solution_image", this.config.data.finishedImage);
         this.scene.load.once(Phaser.Loader.Events.COMPLETE, () => {
             this.solutionImage
                 .setTexture("solution_image")
@@ -418,7 +452,12 @@ export class Puzzle extends Phaser.GameObjects.Container {
         this.scene.add.tween({ alpha: 0.0, targets: fadeOutObjs, duration: fadeTimeMs });
         const allFills = [].concat(...this.fills);
         this.scene.add.tween({ alpha: 0.5, targets: allFills, delay: fadeTimeMs, duration: fadeTimeMs });
-        this.scene.add.tween({ alpha: 1.0, targets: this.titleText, delay: fadeTimeMs, duration: fadeTimeMs });
+        this.scene.add.tween({
+            alpha: 1.0,
+            targets: [this.titleText, this.dateText],
+            delay: fadeTimeMs,
+            duration: fadeTimeMs,
+        });
         this.scene.add.tween({ alpha: 0.5, targets: this.solutionImage, delay: fadeTimeMs, duration: fadeTimeMs });
     }
 
