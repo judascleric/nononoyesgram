@@ -1,0 +1,28 @@
+{
+  "index": [
+    "P000-Test",
+    "P001-Perseids"
+  ],
+  "puzzles": {
+    "P000-Test": {
+      "name": "Test",
+      "path": "../puzzles/P000-Test.json",
+      "id": "P000",
+      "image": "../puzzles/images/P000-Test.png",
+      "size": [
+        10,
+        10
+      ]
+    },
+    "P001-Perseids": {
+      "name": "Perseids",
+      "path": "../puzzles/P001-Perseids.json",
+      "id": "P001",
+      "image": "../puzzles/images/P001-Perseids.png",
+      "size": [
+        10,
+        10
+      ]
+    }
+  }
+}

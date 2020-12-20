@@ -14,4 +14,19 @@ export type Coord = {
     y: number;
 };
 
+export type CompletedPuzzles = Record<string, boolean>;
+
+export type PuzzleEntry = {
+    name: string;
+    path: string;
+    id: string;
+    image: string;
+    size: number[];
+};
+
+export type PuzzleManifest = {
+    index: string[];
+    puzzles: Record<string, PuzzleEntry>;
+};
+
 export type StringIndexed = Record<string, any>;
