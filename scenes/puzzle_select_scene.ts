@@ -11,8 +11,15 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
     private title: Phaser.GameObjects.Text;
     private x1: number;
     private y1: number;
-    private growTween: Phaser.Tweens.Tween;
-    private shrinkTween: Phaser.Tweens.Tween;
+    private x2: number;
+    private y2: number;
+    private scaleFactor = 1.125;
+    private scale1 = this.scale;
+    private scale2 = this.scale * this.scaleFactor;
+    private growTween1: Phaser.Tweens.Tween;
+    private growTween2: Phaser.Tweens.Tween;
+    private shrinkTween1: Phaser.Tweens.Tween;
+    private shrinkTween2: Phaser.Tweens.Tween;
 
     constructor(scene: PuzzleSelectScene, puzzleData: PuzzleEntry, id: number, x: number, y: number, title: string) {
         super(scene, x, y, "puzzle_frame");
@@ -20,10 +27,16 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
         this.id = id;
         this.x1 = x;
         this.y1 = y;
+        this.x2 = x;
+        this.y2 = y;
+        this.scale1 = this.scale;
+        this.scale2 = this.scale * 10;
         this.inputDisabled = false;
         this.inHighlight = false;
-        this.growTween = null;
-        this.shrinkTween = null;
+        this.growTween1 = null;
+        this.growTween2 = null;
+        this.shrinkTween1 = null;
+        this.shrinkTween2 = null;
         this.setOrigin(0.0);
         this.setInteractive();
         this.on("pointerover", () => this.onPointerOver());
@@ -42,15 +55,24 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
 
     onPointerOver() {
         if (!this.inputDisabled && !this.inHighlight) {
-            if (this.shrinkTween && this.shrinkTween.isPlaying()) {
-                this.shrinkTween.stop();
-                this.shrinkTween = null;
+            if (this.shrinkTween1 && this.shrinkTween1.isPlaying()) {
+                this.shrinkTween2.stop();
+                this.shrinkTween2.stop();
+                this.shrinkTween1 = null;
+                this.shrinkTween2 = null;
             }
-            this.growTween = this.scene.add.tween({
+            this.growTween1 = this.scene.add.tween({
                 scale: 1.125,
                 x: this.x1 - 8,
                 y: this.y1 - 8,
-                targets: [this, this.puzzleImage],
+                targets: [this],
+                duration: 100,
+            });
+            this.growTween2 = this.scene.add.tween({
+                scale: this.scale2,
+                x: this.x1 - 8 / this.scale2,
+                y: this.y1 - 8 / this.scale2,
+                targets: [this.puzzleImage],
                 duration: 100,
             });
             this.inHighlight = true;
@@ -59,19 +81,36 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
 
     onPointerOut() {
         if (!this.inputDisabled && this.inHighlight) {
-            if (this.growTween && this.growTween.isPlaying()) {
-                this.growTween.stop();
-                this.growTween = null;
+            if (this.growTween1 && this.growTween1.isPlaying()) {
+                this.growTween1.stop();
+                this.growTween2.stop();
+                this.growTween1 = null;
+                this.growTween2 = null;
             }
-            this.shrinkTween = this.scene.add.tween({
+            this.shrinkTween1 = this.scene.add.tween({
                 scale: 1.0,
                 x: this.x1,
                 y: this.y1,
-                targets: [this, this.puzzleImage],
+                targets: [this],
+                duration: 100,
+            });
+            this.shrinkTween2 = this.scene.add.tween({
+                scale: this.scale1,
+                x: this.x2,
+                y: this.y2,
+                targets: [this.puzzleImage],
                 duration: 100,
             });
             this.inHighlight = false;
         }
+    }
+
+    updatePuzzleImage(textureName: string, width: number, height: number) {
+        this.x2 = this.puzzleImage.x + 10;
+        this.y2 = this.puzzleImage.y + 10;
+        this.puzzleImage.setTexture(textureName).setDisplaySize(width, height).setPosition(this.x2, this.y2);
+        this.scale1 = this.puzzleImage.scale;
+        this.scale2 = this.puzzleImage.scale * 1.125;
     }
 }
 
@@ -159,11 +198,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
             this.load.once(Phaser.Loader.Events.COMPLETE, () => {
                 for (const loadData of this.loadData) {
                     console.log(`${loadData.id} ${loadData.textureName}`);
-                    const image = this.puzzleSquares[loadData.id].puzzleImage;
-                    image
-                        .setTexture(loadData.textureName)
-                        .setDisplaySize(108, 108)
-                        .setPosition(image.x + 10, image.y + 10);
+                    this.puzzleSquares[loadData.id].updatePuzzleImage(loadData.textureName, 108, 108);
                 }
             });
         }
