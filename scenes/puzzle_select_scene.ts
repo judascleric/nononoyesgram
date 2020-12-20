@@ -1,5 +1,5 @@
 import { defaultFontFamily } from "../src/const";
-import { CompletedPuzzles, PuzzleEntry, PuzzleManifest } from "../src/types";
+import { CompletedPuzzles, LoadData, PuzzleEntry, PuzzleManifest } from "../src/types";
 
 class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
     public inHighlight: boolean;
@@ -7,7 +7,7 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
     public inputDisabled: boolean;
     public puzzleData: PuzzleEntry;
 
-    private puzzleFrame: Phaser.GameObjects.Image;
+    public puzzleImage: Phaser.GameObjects.Image;
     private title: Phaser.GameObjects.Text;
     private x1: number;
     private y1: number;
@@ -29,7 +29,7 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
         this.on("pointerover", () => this.onPointerOver());
         this.on("pointerout", () => this.onPointerOut());
         this.on("pointerdown", () => ((this.scene as PuzzleSelectScene).selectedSquare = this));
-        this.puzzleFrame = this.scene.add.image(x, y, "unsolved").setOrigin(0.0);
+        this.puzzleImage = this.scene.add.image(x, y, "unsolved").setOrigin(0.0);
         this.title = this.scene.add
             .text(x - 32, y - 24, title, {
                 fontFamily: defaultFontFamily,
@@ -50,7 +50,7 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
                 scale: 1.125,
                 x: this.x1 - 8,
                 y: this.y1 - 8,
-                targets: [this, this.puzzleFrame],
+                targets: [this, this.puzzleImage],
                 duration: 100,
             });
             this.inHighlight = true;
@@ -67,7 +67,7 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
                 scale: 1.0,
                 x: this.x1,
                 y: this.y1,
-                targets: [this, this.puzzleFrame],
+                targets: [this, this.puzzleImage],
                 duration: 100,
             });
             this.inHighlight = false;
@@ -82,6 +82,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
     private completedPuzzles: CompletedPuzzles;
     private puzzleManifest: PuzzleManifest;
     public selectedSquare: PuzzleSelectSquare;
+    private loadData: LoadData[];
 
     constructor() {
         super({
@@ -90,6 +91,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
     }
 
     preload(): void {
+        this.loadData = [];
         const completedData = localStorage.getItem("completedPuzzles") || "{}";
         this.completedPuzzles = JSON.parse(completedData);
         this.load.json("puzzle_manifest", "../puzzles/all_puzzles.json");
@@ -135,6 +137,11 @@ export class PuzzleSelectScene extends Phaser.Scene {
             const longName = puzzles[id];
             const puzzleData = this.puzzleManifest.puzzles[longName];
             const isSolved = this.completedPuzzles[longName] || false;
+            if (isSolved) {
+                console.log(`isSolved ${longName}`);
+                this.load.image(puzzleData.image, puzzleData.image);
+                this.loadData.push({ id: id, textureName: puzzleData.image });
+            }
             const puzzleSquare = new PuzzleSelectSquare(
                 this,
                 puzzleData,
@@ -145,6 +152,20 @@ export class PuzzleSelectScene extends Phaser.Scene {
             );
             this.puzzleSquares.push(puzzleSquare);
             this.add.existing(puzzleSquare);
+        }
+        console.log(`loadData ${this.loadData.length}`);
+        if (this.loadData.length > 0) {
+            this.load.start();
+            this.load.once(Phaser.Loader.Events.COMPLETE, () => {
+                for (const loadData of this.loadData) {
+                    console.log(`${loadData.id} ${loadData.textureName}`);
+                    const image = this.puzzleSquares[loadData.id].puzzleImage;
+                    image
+                        .setTexture(loadData.textureName)
+                        .setDisplaySize(108, 108)
+                        .setPosition(image.x + 10, image.y + 10);
+                }
+            });
         }
     }
 

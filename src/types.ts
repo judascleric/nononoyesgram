@@ -42,3 +42,8 @@ export type PuzzleData = {
 
     solution: string[];
 };
+
+export type LoadData = {
+    id: number;
+    textureName: string;
+};
