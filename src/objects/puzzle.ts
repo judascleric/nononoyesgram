@@ -1,17 +1,5 @@
-import { Coord, UnitType, Value } from "../types";
+import { Coord, PuzzleData, UnitType, Value } from "../types";
 import { defaultFontFamily } from "../const";
-
-export type UnitHints = number[];
-
-export type PuzzleData = {
-    name: string;
-    id: string;
-    image: string;
-    size: number[];
-    hints: UnitHints[][];
-
-    solution: string[];
-};
 
 export class PuzzleStyle {
     public bgColor: number;
@@ -100,7 +88,7 @@ export class PuzzleConfig {
 }
 
 export class Puzzle extends Phaser.GameObjects.Container {
-    private config: PuzzleConfig;
+    public config: PuzzleConfig;
     public puzzleBG: Phaser.GameObjects.Rectangle;
     private puzzleGrid: Phaser.GameObjects.Line[];
     private puzzleText: Phaser.GameObjects.Text[];

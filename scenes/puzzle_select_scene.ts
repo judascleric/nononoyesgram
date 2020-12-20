@@ -13,20 +13,10 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
     private y1: number;
     private growTween: Phaser.Tweens.Tween;
     private shrinkTween: Phaser.Tweens.Tween;
-    private callback: (square: PuzzleSelectSquare) => void;
 
-    constructor(
-        scene: Phaser.Scene,
-        puzzleData: PuzzleEntry,
-        id: number,
-        x: number,
-        y: number,
-        title: string,
-        callback: (square: PuzzleSelectSquare) => void,
-    ) {
+    constructor(scene: PuzzleSelectScene, puzzleData: PuzzleEntry, id: number, x: number, y: number, title: string) {
         super(scene, x, y, "puzzle_frame");
         this.puzzleData = puzzleData;
-        this.callback = callback;
         this.id = id;
         this.x1 = x;
         this.y1 = y;
@@ -38,7 +28,7 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
         this.setInteractive();
         this.on("pointerover", () => this.onPointerOver());
         this.on("pointerout", () => this.onPointerOut());
-        this.on("pointerdown", () => this.callback(this));
+        this.on("pointerdown", () => ((this.scene as PuzzleSelectScene).selectedSquare = this));
         this.puzzleFrame = this.scene.add.image(x, y, "unsolved").setOrigin(0.0);
         this.title = this.scene.add
             .text(x - 32, y - 24, title, {
@@ -91,6 +81,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
     private puzzleSquares: PuzzleSelectSquare[];
     private completedPuzzles: CompletedPuzzles;
     private puzzleManifest: PuzzleManifest;
+    public selectedSquare: PuzzleSelectSquare;
 
     constructor() {
         super({
@@ -101,7 +92,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
     preload(): void {
         const completedData = localStorage.getItem("completedPuzzles") || "{}";
         this.completedPuzzles = JSON.parse(completedData);
-        this.load.json("puzzle_data", "../puzzles/all_puzzles.json");
+        this.load.json("puzzle_manifest", "../puzzles/all_puzzles.json");
         this.load.image("bg_forest", "../assets/bg_forest_900_600.png");
         this.load.audio("bgm_chill", ["../assets/bgm_chill.m4a"]);
         this.load.image("missing", "../assets/missing.png");
@@ -110,8 +101,9 @@ export class PuzzleSelectScene extends Phaser.Scene {
     }
 
     create(): void {
-        this.puzzleManifest = this.cache.json.get("puzzle_data") as PuzzleManifest;
+        this.puzzleManifest = this.cache.json.get("puzzle_manifest") as PuzzleManifest;
         this.puzzleSquares = [];
+        this.selectedSquare = null;
         this.cameras.main.setBounds(0, 0, 900, 600);
         this.background = this.add.image(0, 0, "bg_forest").setOrigin(0, 0);
         this.bgm = this.sound.add("bgm_chill", { loop: true });
@@ -150,14 +142,16 @@ export class PuzzleSelectScene extends Phaser.Scene {
                 left + x * xspacing,
                 top + y * yspacing,
                 isSolved ? puzzleData.name : puzzleData.id,
-                this.onSelect,
             );
             this.puzzleSquares.push(puzzleSquare);
             this.add.existing(puzzleSquare);
         }
     }
 
-    onSelect(square: PuzzleSelectSquare): void {
-        console.log(`selected ${square.puzzleData.id}`);
+    update(): void {
+        if (this.selectedSquare !== null) {
+            localStorage.setItem("selected_puzzle", this.selectedSquare.puzzleData.path);
+            this.scene.start("GameScene");
+        }
     }
 }

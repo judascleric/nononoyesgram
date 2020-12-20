@@ -11,7 +11,11 @@ module.exports = {
     module: {
         rules: [
             { test: /\.ts$/, loader: "ts-loader", exclude: "/node_modules/" },
-            { test: /phaser\.js$/, loader: "expose-loader", options: { exposes: ["Phaser"] } },
+            {
+                test: /phaser\.js$/,
+                loader: "expose-loader",
+                options: { exposes: { globalName: "Phaser", override: true } },
+            },
         ],
     },
     devServer: {

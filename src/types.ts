@@ -30,3 +30,15 @@ export type PuzzleManifest = {
 };
 
 export type StringIndexed = Record<string, any>;
+
+export type UnitHints = number[];
+
+export type PuzzleData = {
+    name: string;
+    id: string;
+    image: string;
+    size: number[];
+    hints: UnitHints[][];
+
+    solution: string[];
+};

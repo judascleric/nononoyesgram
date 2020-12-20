@@ -5,6 +5,7 @@ export class GameScene extends Phaser.Scene {
     private bgm: Phaser.Sound.BaseSound;
     private puzzle: Puzzle;
     private outroStarted: boolean;
+    private selectedPuzzleFilePath;
 
     constructor() {
         super({
@@ -14,9 +15,10 @@ export class GameScene extends Phaser.Scene {
     }
 
     preload(): void {
+        this.selectedPuzzleFilePath = localStorage.getItem("selected_puzzle");
         this.load.image("bg_forest", "../assets/bg_forest_900_600.png");
         this.load.audio("bgm_chill", ["../assets/bgm_chill.m4a"]);
-        this.load.json("puzzle_data", "../puzzles/P001-Perseids.json");
+        this.load.json(this.selectedPuzzleFilePath, this.selectedPuzzleFilePath);
         this.load.image("missing", "../assets/missing.png");
     }
 
@@ -33,7 +35,7 @@ export class GameScene extends Phaser.Scene {
                 this.bgm.play();
             });
         }
-        const data = this.cache.json.get("puzzle_data");
+        const data = this.cache.json.get(this.selectedPuzzleFilePath);
         const style = new PuzzleStyle();
         this.puzzle = new Puzzle(this, new PuzzleConfig(data, style));
         this.input.on("pointermove", (pointer: Phaser.Input.Pointer) => this.puzzle.onPointerMove(pointer), this);
@@ -45,6 +47,18 @@ export class GameScene extends Phaser.Scene {
         const solved = this.puzzle.update();
         if (solved && !this.outroStarted) {
             this.outroStarted = true;
+            this.input.on(
+                "pointerdown",
+                () => {
+                    const completedData = localStorage.getItem("completedPuzzles") || "{}";
+                    const completedPuzzles = JSON.parse(completedData);
+                    const longName = `${this.puzzle.config.data.id}-${this.puzzle.config.data.name}`;
+                    completedPuzzles[longName] = true;
+                    localStorage.setItem("completedPuzzles", JSON.stringify(completedPuzzles));
+                    this.scene.start("PuzzleSelectScene");
+                },
+                this,
+            );
         }
     }
 }

@@ -12,8 +12,8 @@ const config: Phaser.Types.Core.GameConfig = {
     render: {
         pixelArt: true,
     },
-    scene: PuzzleSelectScene,
-    // scene: GameScene,
+    scene: [PuzzleSelectScene, GameScene],
+    // scene: [GameScene],
 };
 
 export class Game extends Phaser.Game {
