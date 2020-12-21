@@ -8,7 +8,12 @@
     "P006-Pronto Xmas Party",
     "P007-PAX '08",
     "P008-Page 44",
-    "P009-BBTT I"
+    "P009-BBTT I",
+    "P010-Graduation",
+    "P011-Chairman Meow",
+    "P012-Cruise Ship",
+    "P013-My Heart Will Go On",
+    "P014-Barbados"
   ],
   "puzzles": {
     "P001-Ice Cream": {
@@ -108,6 +113,61 @@
       "size": [
         10,
         10
+      ]
+    },
+    "P010-Graduation": {
+      "name": "Graduation",
+      "path": "../puzzles/P010-Graduation-2009-06-21.json",
+      "id": "P010",
+      "date": "2009-06-21",
+      "image": "../puzzles/images/P010-Graduation-2009-06-21.finished.png",
+      "size": [
+        10,
+        10
+      ]
+    },
+    "P011-Chairman Meow": {
+      "name": "Chairman Meow",
+      "path": "../puzzles/P011-Chairman_Meow-2010-03-21.json",
+      "id": "P011",
+      "date": "2010-03-21",
+      "image": "../puzzles/images/P011-Chairman_Meow-2010-03-21.finished.png",
+      "size": [
+        15,
+        10
+      ]
+    },
+    "P012-Cruise Ship": {
+      "name": "Cruise Ship",
+      "path": "../puzzles/P012-Cruise_Ship-2011-07-18.json",
+      "id": "P012",
+      "date": "2011-07-18",
+      "image": "../puzzles/images/P012-Cruise_Ship-2011-07-18.finished.png",
+      "size": [
+        15,
+        10
+      ]
+    },
+    "P013-My Heart Will Go On": {
+      "name": "My Heart Will Go On",
+      "path": "../puzzles/P013-My_Heart_Will_Go_On-2011-07-19.json",
+      "id": "P013",
+      "date": "2011-07-19",
+      "image": "../puzzles/images/P013-My_Heart_Will_Go_On-2011-07-19.finished.png",
+      "size": [
+        15,
+        15
+      ]
+    },
+    "P014-Barbados": {
+      "name": "Barbados",
+      "path": "../puzzles/P014-Barbados-2011-07-22.json",
+      "id": "P014",
+      "date": "2011-07-22",
+      "image": "../puzzles/images/P014-Barbados-2011-07-22.finished.png",
+      "size": [
+        15,
+        15
       ]
     }
   }

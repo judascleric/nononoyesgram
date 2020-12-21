@@ -53,13 +53,13 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
         this.puzzleImage = this.scene.add.image(x, y, "unsolved").setOrigin(0.0);
         const title = isSolved ? this.puzzleData.name : this.puzzleData.id;
         this.title = this.scene.add
-            .text(x - 32, y - 24, title, {
+            .text(x - 44, y - 24, title, {
                 fontFamily: defaultFontFamily,
                 fontSize: "18px",
                 align: "center",
             })
             .setOrigin(0, 0)
-            .setFixedSize(192, 0);
+            .setFixedSize(216, 0);
         const date = isSolved ? this.puzzleData.date : "";
         this.date = this.scene.add
             .text(x - 32, y - 40, date, {
@@ -190,7 +190,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
             .text(120, 80, "Puzzle Select", { fontFamily: defaultFontFamily, fontSize: "42px", align: "center" })
             .setOrigin(0, 0)
             .setFixedSize(900 - 240, 0);
-        this.next = this.add.triangle(830, 310, 0, 0, 48, 24, 0, 48, 0xdddddd).setOrigin(0, 0).setInteractive();
+        this.next = this.add.triangle(840, 300, 0, 0, 48, 24, 0, 48, 0xdddddd).setOrigin(0, 0).setInteractive();
         if (this.pageOffset + this.maxPuzzles >= this.puzzleManifest.index.length) {
             this.next.setVisible(false);
         } else {
@@ -201,7 +201,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
                 this.scene.restart();
             });
         }
-        this.prev = this.add.triangle(30, 310, 0, 24, 48, 0, 48, 48, 0xdddddd).setOrigin(0, 0).setInteractive();
+        this.prev = this.add.triangle(20, 300, 0, 24, 48, 0, 48, 48, 0xdddddd).setOrigin(0, 0).setInteractive();
         if (this.pageOffset === 0) {
             this.prev.setVisible(false);
         } else {
@@ -217,7 +217,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
         const left = 80;
         const top = 180;
         const xspacing = 200;
-        const yspacing = 180;
+        const yspacing = 200;
         for (let id = 0; id < puzzles.length; ++id) {
             const y = Math.floor(id / 4);
             const x = id % 4;
