@@ -55,6 +55,7 @@ export class GameScene extends Phaser.Scene {
                     const longName = `${this.puzzle.config.data.id}-${this.puzzle.config.data.name}`;
                     completedPuzzles[longName] = true;
                     localStorage.setItem("completedPuzzles", JSON.stringify(completedPuzzles));
+                    this.bgm.stop();
                     this.scene.start("PuzzleSelectScene");
                 },
                 this,

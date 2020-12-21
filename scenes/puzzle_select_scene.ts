@@ -230,6 +230,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
     update(): void {
         if (this.selectedSquare !== null) {
             localStorage.setItem("selected_puzzle", this.selectedSquare.puzzleData.path);
+            this.bgm.stop();
             this.scene.start("GameScene");
         }
     }
