@@ -4,6 +4,11 @@ export enum Value {
     FILL = 2,
 }
 
+export enum DimType {
+    WIDTH = 0,
+    HEIGHT = 1,
+}
+
 export enum UnitType {
     ROW = 0,
     COL = 1,

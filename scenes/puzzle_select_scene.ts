@@ -15,8 +15,10 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
     private x2: number;
     private y2: number;
     private scaleFactor = 1.125;
-    private scale1 = 1.0;
-    private scale2 = this.scaleFactor;
+    private scale1x = 1.0;
+    private scale1y = 1.0;
+    private scale2x = this.scaleFactor;
+    private scale2y = this.scaleFactor;
     private growTween1: Phaser.Tweens.Tween;
     private growTween2: Phaser.Tweens.Tween;
     private shrinkTween1: Phaser.Tweens.Tween;
@@ -85,9 +87,10 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
                 duration: 100,
             });
             this.growTween2 = this.scene.add.tween({
-                scale: this.scale2,
-                x: this.x1 - 8 / this.scale2,
-                y: this.y1 - 8 / this.scale2,
+                scaleX: this.scale2x,
+                scaleY: this.scale2y,
+                x: this.x1 - 8 / this.scale2x,
+                y: this.y1 - 8 / this.scale2y,
                 targets: [this.puzzleImage],
                 duration: 100,
             });
@@ -111,7 +114,8 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
                 duration: 100,
             });
             this.shrinkTween2 = this.scene.add.tween({
-                scale: this.scale1,
+                scaleX: this.scale1x,
+                scaleY: this.scale1y,
                 x: this.x2,
                 y: this.y2,
                 targets: [this.puzzleImage],
@@ -125,8 +129,10 @@ class PuzzleSelectSquare extends Phaser.GameObjects.Sprite {
         this.x2 = this.puzzleImage.x + 10;
         this.y2 = this.puzzleImage.y + 10;
         this.puzzleImage.setTexture(textureName).setDisplaySize(width, height).setPosition(this.x2, this.y2);
-        this.scale1 = this.puzzleImage.scale;
-        this.scale2 = this.puzzleImage.scale * 1.125;
+        this.scale1x = this.puzzleImage.scaleX;
+        this.scale1y = this.puzzleImage.scaleY;
+        this.scale2x = this.puzzleImage.scaleX * 1.125;
+        this.scale2y = this.puzzleImage.scaleY * 1.125;
     }
 }
 

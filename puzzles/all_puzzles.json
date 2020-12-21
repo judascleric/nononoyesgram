@@ -2,7 +2,9 @@
   "index": [
     "P001-Ice Cream",
     "P002-Perseids",
-    "P003-Holding Hands"
+    "P003-Holding Hands",
+    "P004-I Love You",
+    "P005-Chili Oil"
   ],
   "puzzles": {
     "P001-Ice Cream": {
@@ -36,6 +38,28 @@
       "size": [
         15,
         15
+      ]
+    },
+    "P004-I Love You": {
+      "name": "I Love You",
+      "path": "../puzzles/P004-I_Love_You-2007-09-08.json",
+      "id": "P004",
+      "date": "2007-09-08",
+      "image": "../puzzles/images/P004-I_Love_You-2007-09-08.png",
+      "size": [
+        10,
+        10
+      ]
+    },
+    "P005-Chili Oil": {
+      "name": "Chili Oil",
+      "path": "../puzzles/P005-Chili_Oil-2007-09-23.json",
+      "id": "P005",
+      "date": "2007-09-23",
+      "image": "../puzzles/images/P005-Chili_Oil-2007-09-23.finished.png",
+      "size": [
+        15,
+        10
       ]
     }
   }

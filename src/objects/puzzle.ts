@@ -1,4 +1,4 @@
-import { Coord, PuzzleData, UnitType, Value } from "../types";
+import { Coord, DimType, PuzzleData, UnitType, Value } from "../types";
 import { defaultFontFamily } from "../const";
 
 export class PuzzleStyle {
@@ -52,7 +52,7 @@ export class PuzzleDim {
     public dateYOff: number;
     public textStyle: Phaser.Types.GameObjects.Text.TextStyle;
     constructor(data: PuzzleData) {
-        if (data.size[UnitType.ROW] === 10 && data.size[UnitType.COL] === 10) {
+        if (data.size[DimType.WIDTH] === 10 && data.size[DimType.HEIGHT] === 10) {
             this.unitSpace = 40;
             this.width = 400;
             this.height = 400;
@@ -72,7 +72,7 @@ export class PuzzleDim {
             this.titleYOff = -32;
             this.dateYOff = -64;
             this.textStyle = { fontFamily: defaultFontFamily, fontSize: "28px", align: "right" };
-        } else if (data.size[UnitType.ROW] === 15 && data.size[UnitType.COL] === 15) {
+        } else if (data.size[DimType.WIDTH] === 15 && data.size[DimType.HEIGHT] === 15) {
             this.unitSpace = 26;
             this.width = 26 * 15;
             this.height = 26 * 15;
@@ -92,6 +92,26 @@ export class PuzzleDim {
             this.titleYOff = -32;
             this.dateYOff = -64;
             this.textStyle = { fontFamily: defaultFontFamily, fontSize: "23px", align: "right" };
+        } else if (data.size[DimType.WIDTH] === 15 && data.size[DimType.HEIGHT] === 10) {
+            this.unitSpace = 40;
+            this.width = this.unitSpace * 15;
+            this.height = this.unitSpace * 10;
+            this.left = 220;
+            this.top = 180;
+            this.right = this.left + this.width;
+            this.bottom = this.top + this.height;
+            this.fontWidth = 18;
+            this.fontHeight = 13;
+            this.rowTextXOff = 0;
+            this.rowTextYOff = 8;
+            this.colTextXOff = 12;
+            this.colTextYOff = -18;
+            this.fillPad = 4;
+            this.xPad = 6;
+            this.hPad = 2;
+            this.titleYOff = -32;
+            this.dateYOff = -64;
+            this.textStyle = { fontFamily: defaultFontFamily, fontSize: "28px", align: "right" };
         } else {
             throw new Error(`No Dimensions defined for puzzle size ${data.size}`);
         }
@@ -136,9 +156,9 @@ export class Puzzle extends Phaser.GameObjects.Container {
         this.outroStarted = false;
         this.parseSolution();
 
-        this.squareValues = new Array<Value[]>(this.config.data.size[UnitType.ROW]);
+        this.squareValues = new Array<Value[]>(this.config.data.size[DimType.HEIGHT]);
         for (let i = 0; i < this.config.data.size[UnitType.ROW]; ++i) {
-            this.squareValues[i] = new Array<Value>(this.config.data.size[UnitType.COL]).fill(Value.UNSOLVED);
+            this.squareValues[i] = new Array<Value>(this.config.data.size[DimType.WIDTH]).fill(Value.UNSOLVED);
         }
         this.activeBrush = Value.FILL;
         this.curTouch = { x: 0, y: 0 };
@@ -227,9 +247,9 @@ export class Puzzle extends Phaser.GameObjects.Container {
             this.puzzleText.push(text);
             this.add(text);
         }
-        for (let j = 0; j < this.config.data.size[UnitType.ROW]; ++j) {
+        for (let j = 0; j < this.config.data.size[DimType.HEIGHT]; ++j) {
             this.fills.push([]);
-            for (let i = 0; i < this.config.data.size[UnitType.COL]; ++i) {
+            for (let i = 0; i < this.config.data.size[DimType.WIDTH]; ++i) {
                 const fill = new Phaser.GameObjects.Rectangle(
                     this.scene,
                     dim.left + i * dim.unitSpace + dim.fillPad,
@@ -245,9 +265,9 @@ export class Puzzle extends Phaser.GameObjects.Container {
                 this.add(fill);
             }
         }
-        for (let j = 0; j < this.config.data.size[UnitType.ROW]; ++j) {
+        for (let j = 0; j < this.config.data.size[DimType.HEIGHT]; ++j) {
             this.xs.push([]);
-            for (let i = 0; i < this.config.data.size[UnitType.COL]; ++i) {
+            for (let i = 0; i < this.config.data.size[DimType.WIDTH]; ++i) {
                 const x1 = new Phaser.GameObjects.Line(
                     this.scene,
                     dim.left + i * dim.unitSpace,
@@ -379,6 +399,7 @@ export class Puzzle extends Phaser.GameObjects.Container {
             if (coord.x !== this.curTouch.x || coord.y !== this.curTouch.y) {
                 this.curTouch = coord;
                 const cur = this.squareValues[coord.y][coord.x];
+                console.log(`onPointerMove() - cur = ${cur}`);
                 if (this.activeBrush === Value.UNSOLVED || cur === Value.UNSOLVED) {
                     this.setSquare(coord, this.activeBrush);
                 }
@@ -433,8 +454,8 @@ export class Puzzle extends Phaser.GameObjects.Container {
     }
 
     isSolved(): boolean {
-        for (let y = 0; y < this.config.data.size[UnitType.ROW]; ++y) {
-            for (let x = 0; x < this.config.data.size[UnitType.COL]; ++x) {
+        for (let y = 0; y < this.config.data.size[DimType.HEIGHT]; ++y) {
+            for (let x = 0; x < this.config.data.size[DimType.WIDTH]; ++x) {
                 if (this.solution[y][x] === Value.FILL && this.squareValues[y][x] !== Value.FILL) {
                     return false;
                 }
