@@ -1,4 +1,5 @@
 import { Puzzle, PuzzleConfig, PuzzleStyle } from "../src/objects/puzzle";
+import { defaultFontFamily } from "../src/const";
 
 export class GameScene extends Phaser.Scene {
     private background: Phaser.GameObjects.Image;
@@ -6,6 +7,7 @@ export class GameScene extends Phaser.Scene {
     private puzzle: Puzzle;
     private outroStarted: boolean;
     private selectedPuzzleFilePath;
+    private back: Phaser.GameObjects.Text;
 
     constructor() {
         super({
@@ -35,6 +37,18 @@ export class GameScene extends Phaser.Scene {
                 this.bgm.play();
             });
         }
+        this.back = this.add
+            .text(800, 20, "back", {
+                fontFamily: defaultFontFamily,
+                fontSize: "28px",
+                align: "center",
+            })
+            .setOrigin(0, 0)
+            .setInteractive();
+        this.back.input.gameObject.on("pointerdown", () => {
+            this.bgm.stop();
+            this.scene.start("PuzzleSelectScene");
+        });
         const data = this.cache.json.get(this.selectedPuzzleFilePath);
         const style = new PuzzleStyle();
         this.puzzle = new Puzzle(this, new PuzzleConfig(data, style));
@@ -47,14 +61,14 @@ export class GameScene extends Phaser.Scene {
         const solved = this.puzzle.update();
         if (solved && !this.outroStarted) {
             this.outroStarted = true;
+            const completedData = localStorage.getItem("completedPuzzles") || "{}";
+            const completedPuzzles = JSON.parse(completedData);
+            const longName = `${this.puzzle.config.data.id}-${this.puzzle.config.data.name}`;
+            completedPuzzles[longName] = true;
+            localStorage.setItem("completedPuzzles", JSON.stringify(completedPuzzles));
             this.input.on(
                 "pointerdown",
                 () => {
-                    const completedData = localStorage.getItem("completedPuzzles") || "{}";
-                    const completedPuzzles = JSON.parse(completedData);
-                    const longName = `${this.puzzle.config.data.id}-${this.puzzle.config.data.name}`;
-                    completedPuzzles[longName] = true;
-                    localStorage.setItem("completedPuzzles", JSON.stringify(completedPuzzles));
                     this.bgm.stop();
                     this.scene.start("PuzzleSelectScene");
                 },

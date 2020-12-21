@@ -144,6 +144,10 @@ export class PuzzleSelectScene extends Phaser.Scene {
     private puzzleManifest: PuzzleManifest;
     public selectedSquare: PuzzleSelectSquare;
     private loadData: LoadData[];
+    private pageOffset: number;
+    private maxPuzzles = 8;
+    private next: Phaser.GameObjects.Triangle;
+    private prev: Phaser.GameObjects.Triangle;
 
     constructor() {
         super({
@@ -155,6 +159,7 @@ export class PuzzleSelectScene extends Phaser.Scene {
         this.loadData = [];
         // localStorage.setItem("completedPuzzles", "{}");
         const completedData = localStorage.getItem("completedPuzzles") || "{}";
+        this.pageOffset = parseInt(localStorage.getItem("pageOffset") || "0");
         this.completedPuzzles = JSON.parse(completedData);
         this.load.json("puzzle_manifest", "../puzzles/all_puzzles.json");
         this.load.image("bg_forest", "../assets/bg_forest_900_600.png");
@@ -185,10 +190,30 @@ export class PuzzleSelectScene extends Phaser.Scene {
             .text(120, 80, "Puzzle Select", { fontFamily: defaultFontFamily, fontSize: "42px", align: "center" })
             .setOrigin(0, 0)
             .setFixedSize(900 - 240, 0);
+        this.next = this.add.triangle(830, 310, 0, 0, 48, 24, 0, 48, 0xdddddd).setOrigin(0, 0).setInteractive();
+        if (this.pageOffset + this.maxPuzzles >= this.puzzleManifest.index.length) {
+            this.next.setVisible(false);
+        } else {
+            this.next.input.gameObject.on("pointerdown", () => {
+                this.pageOffset += this.maxPuzzles;
+                localStorage.setItem("pageOffset", this.pageOffset.toString());
+                this.bgm.stop();
+                this.scene.restart();
+            });
+        }
+        this.prev = this.add.triangle(30, 310, 0, 24, 48, 0, 48, 48, 0xdddddd).setOrigin(0, 0).setInteractive();
+        if (this.pageOffset === 0) {
+            this.prev.setVisible(false);
+        } else {
+            this.prev.input.gameObject.on("pointerdown", () => {
+                this.pageOffset -= this.maxPuzzles;
+                localStorage.setItem("pageOffset", this.pageOffset.toString());
+                this.bgm.stop();
+                this.scene.restart();
+            });
+        }
 
-        const maxPuzzles = 8;
-        const pageOffset = 0;
-        const puzzles = this.puzzleManifest.index.slice(pageOffset, pageOffset + maxPuzzles);
+        const puzzles = this.puzzleManifest.index.slice(this.pageOffset, this.pageOffset + this.maxPuzzles);
         const left = 80;
         const top = 180;
         const xspacing = 200;
@@ -215,7 +240,6 @@ export class PuzzleSelectScene extends Phaser.Scene {
             this.puzzleSquares.push(puzzleSquare);
             this.add.existing(puzzleSquare);
         }
-        console.log(`loadData ${this.loadData.length}`);
         if (this.loadData.length > 0) {
             this.load.start();
             this.load.once(Phaser.Loader.Events.COMPLETE, () => {

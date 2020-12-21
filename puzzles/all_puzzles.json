@@ -7,7 +7,8 @@
     "P005-Chili Oil",
     "P006-Pronto Xmas Party",
     "P007-PAX '08",
-    "P008-Page 44"
+    "P008-Page 44",
+    "P009-BBTT I"
   ],
   "puzzles": {
     "P001-Ice Cream": {
@@ -95,6 +96,17 @@
       "image": "../puzzles/images/P008-Page_44-2008-11-10.finished.png",
       "size": [
         15,
+        10
+      ]
+    },
+    "P009-BBTT I": {
+      "name": "BBTT I",
+      "path": "../puzzles/P009-BBTT_I-2009-06-05.json",
+      "id": "P009",
+      "date": "2009-06-05",
+      "image": "../puzzles/images/P009-BBTT_I-2009-06-05.finished.png",
+      "size": [
+        10,
         10
       ]
     }
