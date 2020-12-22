@@ -112,6 +112,26 @@ export class PuzzleDim {
             this.titleYOff = -32;
             this.dateYOff = -64;
             this.textStyle = { fontFamily: defaultFontFamily, fontSize: "28px", align: "right" };
+        } else if (data.size[DimType.WIDTH] === 20 && data.size[DimType.HEIGHT] === 15) {
+            this.unitSpace = 26;
+            this.width = 26 * 20;
+            this.height = 26 * 15;
+            this.left = 220;
+            this.top = 180;
+            this.right = this.left + this.width;
+            this.bottom = this.top + this.height;
+            this.fontWidth = 15;
+            this.fontHeight = 11;
+            this.rowTextXOff = 4;
+            this.rowTextYOff = 3;
+            this.colTextXOff = 6;
+            this.colTextYOff = -14;
+            this.fillPad = 4;
+            this.xPad = 6;
+            this.hPad = 2;
+            this.titleYOff = -32;
+            this.dateYOff = -64;
+            this.textStyle = { fontFamily: defaultFontFamily, fontSize: "23px", align: "right" };
         } else {
             throw new Error(`No Dimensions defined for puzzle size ${data.size}`);
         }

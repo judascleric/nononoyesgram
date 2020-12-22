@@ -13,7 +13,12 @@
     "P011-Chairman Meow",
     "P012-Cruise Ship",
     "P013-My Heart Will Go On",
-    "P014-Barbados"
+    "P014-Barbados",
+    "P015-On A Boat",
+    "P016-Eiffel Tower",
+    "P017-Lock Bridge",
+    "P018-Neuschwanstein",
+    "P019-Our House"
   ],
   "puzzles": {
     "P001-Ice Cream": {
@@ -167,6 +172,61 @@
       "image": "../puzzles/images/P014-Barbados-2011-07-22.finished.png",
       "size": [
         15,
+        15
+      ]
+    },
+    "P015-On A Boat": {
+      "name": "On A Boat",
+      "path": "../puzzles/P015-On_A_Boat-2012-08-04.json",
+      "id": "P015",
+      "date": "2012-08-04",
+      "image": "../puzzles/images/P015-On_A_Boat-2012-08-04.finished.png",
+      "size": [
+        15,
+        15
+      ]
+    },
+    "P016-Eiffel Tower": {
+      "name": "Eiffel Tower",
+      "path": "../puzzles/P016-Eiffel_Tower-2012-08-08.json",
+      "id": "P016",
+      "date": "2012-08-08",
+      "image": "../puzzles/images/P016-Eiffel_Tower-2012-08-08.finished.png",
+      "size": [
+        15,
+        15
+      ]
+    },
+    "P017-Lock Bridge": {
+      "name": "Lock Bridge",
+      "path": "../puzzles/P017-Lock_Bridge-2012-08-09.json",
+      "id": "P017",
+      "date": "2012-08-09",
+      "image": "../puzzles/images/P017-Lock_Bridge-2012-08-09.finished.png",
+      "size": [
+        15,
+        15
+      ]
+    },
+    "P018-Neuschwanstein": {
+      "name": "Neuschwanstein",
+      "path": "../puzzles/P018-Neuschwanstein-2012-08-13.json",
+      "id": "P018",
+      "date": "2012-08-13",
+      "image": "../puzzles/images/P018-Neuschwanstein-2012-08-13.finished.png",
+      "size": [
+        15,
+        15
+      ]
+    },
+    "P019-Our House": {
+      "name": "Our House",
+      "path": "../puzzles/P019-Our_House-2014-06-05.json",
+      "id": "P019",
+      "date": "2014-06-05",
+      "image": "../puzzles/images/P019-Our_House-2014-06-05.finished.png",
+      "size": [
+        20,
         15
       ]
     }
