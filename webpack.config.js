@@ -1,9 +1,17 @@
-var path = require("path");
-var pathToPhaser = path.join(__dirname, "/node_modules/phaser/");
-var phaser = path.join(pathToPhaser, "dist/phaser.js");
+const path = require("path");
+const pathToPhaser = path.join(__dirname, "/node_modules/phaser/");
+const phaser = path.join(pathToPhaser, "dist/phaser.js");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: "./src/nononoyesgram.ts",
+    plugins: [
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: "./index.html" }
+            ]
+        })
+    ],
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "bundle.js",
