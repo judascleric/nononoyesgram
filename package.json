@@ -5,7 +5,7 @@
   "license": "ISC",
   "scripts": {
     "dev": "webpack serve --mode development && webpack-dev-server --mode development",
-    "build": "webpack serve --mode production"
+    "build": "webpack-cli --mode production"
   },
   "dependencies": {
     "phaser": "^3.24.1"
