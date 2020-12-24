@@ -388,13 +388,19 @@ export class Puzzle extends Phaser.GameObjects.Container {
             .setOrigin(0, 0)
             .setAlpha(0.0);
         this.add(this.solutionImage);
-        this.scene.load.image("solution_image", this.config.data.finishedImage);
-        this.scene.load.once(Phaser.Loader.Events.COMPLETE, () => {
+        if (this.scene.textures.exists(this.config.data.finishedImage)) {
             this.solutionImage
-                .setTexture("solution_image")
+                .setTexture(this.config.data.finishedImage)
                 .setDisplaySize(this.config.dim.width, this.config.dim.height);
-        });
-        this.scene.load.start();
+        } else {
+            this.scene.load.image(this.config.data.finishedImage, this.config.data.finishedImage);
+            this.scene.load.start();
+            this.scene.load.once(Phaser.Loader.Events.COMPLETE, () => {
+                this.solutionImage
+                    .setTexture(this.config.data.finishedImage)
+                    .setDisplaySize(this.config.dim.width, this.config.dim.height);
+            });
+        }
         this.scene.add.existing(this);
     }
 

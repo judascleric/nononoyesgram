@@ -224,11 +224,6 @@ export class PuzzleSelectScene extends Phaser.Scene {
             const longName = puzzles[id];
             const puzzleData = this.puzzleManifest.puzzles[longName];
             const isSolved = this.completedPuzzles[longName] || false;
-            if (isSolved) {
-                console.log(`isSolved ${longName}`);
-                this.load.image(puzzleData.image, puzzleData.image);
-                this.loadData.push({ id: id, textureName: puzzleData.image });
-            }
             const puzzleSquare = new PuzzleSelectSquare(
                 this,
                 puzzleData,
@@ -239,12 +234,21 @@ export class PuzzleSelectScene extends Phaser.Scene {
             );
             this.puzzleSquares.push(puzzleSquare);
             this.add.existing(puzzleSquare);
+            if (isSolved) {
+                // console.log(`isSolved ${longName}`);
+                if (this.textures.exists(puzzleData.image)) {
+                    this.puzzleSquares[id].updatePuzzleImage(puzzleData.image, 108, 108);
+                } else {
+                    this.load.image(puzzleData.image, puzzleData.image);
+                    this.loadData.push({ id: id, textureName: puzzleData.image });
+                }
+            }
         }
         if (this.loadData.length > 0) {
             this.load.start();
             this.load.once(Phaser.Loader.Events.COMPLETE, () => {
                 for (const loadData of this.loadData) {
-                    console.log(`${loadData.id} ${loadData.textureName}`);
+                    // console.log(`${loadData.id} ${loadData.textureName}`);
                     this.puzzleSquares[loadData.id].updatePuzzleImage(loadData.textureName, 108, 108);
                 }
             });
