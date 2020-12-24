@@ -18,7 +18,12 @@
     "P016-Eiffel Tower",
     "P017-Lock Bridge",
     "P018-Neuschwanstein",
-    "P019-Our House"
+    "P019-Our House",
+    "P020-Malcolm",
+    "P021-Our New House",
+    "P022-William",
+    "P023-Ren Faire",
+    "P024-Anduril and Orange"
   ],
   "puzzles": {
     "P001-Ice Cream": {
@@ -227,6 +232,61 @@
       "image": "../puzzles/images/P019-Our_House-2014-06-05.finished.png",
       "size": [
         20,
+        15
+      ]
+    },
+    "P020-Malcolm": {
+      "name": "Malcolm",
+      "path": "../puzzles/P020-Malcolm-2014-10-01.json",
+      "id": "P020",
+      "date": "2014-10-01",
+      "image": "../puzzles/images/P020-Malcolm-2014-10-01.finished.png",
+      "size": [
+        20,
+        15
+      ]
+    },
+    "P021-Our New House": {
+      "name": "Our New House",
+      "path": "../puzzles/P021-Our_New_House-2015-07-05.json",
+      "id": "P021",
+      "date": "2015-07-05",
+      "image": "../puzzles/images/P021-Our_New_House-2015-07-05.finished.png",
+      "size": [
+        20,
+        15
+      ]
+    },
+    "P022-William": {
+      "name": "William",
+      "path": "../puzzles/P022-William-2017-08-02.json",
+      "id": "P022",
+      "date": "2017-08-02",
+      "image": "../puzzles/images/P022-William-2017-08-02.finished.png",
+      "size": [
+        17,
+        16
+      ]
+    },
+    "P023-Ren Faire": {
+      "name": "Ren Faire",
+      "path": "../puzzles/P023-Ren_Faire-2019-10-24.json",
+      "id": "P023",
+      "date": "2019-10-24",
+      "image": "../puzzles/images/P023-Ren_Faire-2019-10-24.finished.png",
+      "size": [
+        20,
+        15
+      ]
+    },
+    "P024-Anduril and Orange": {
+      "name": "Anduril and Orange",
+      "path": "../puzzles/P024-Anduril_and_Orange-2020-03-08.json",
+      "id": "P024",
+      "date": "2020-03-08",
+      "image": "../puzzles/images/P024-Anduril_and_Orange-2020-03-08.finished.png",
+      "size": [
+        15,
         15
       ]
     }
